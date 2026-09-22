@@ -15,8 +15,8 @@ extension NSPasteboard.PasteboardType: Defaults.Serializable {
   // https://github.com/p0deje/Maccy/issues/429#issuecomment-1182575226
   static let modified = NSPasteboard.PasteboardType(rawValue: "x.nspasteboard.ModifiedType")
 
-  // Marks that copy was made from Maccy.
-  static let fromMaccy = NSPasteboard.PasteboardType(rawValue: "org.p0deje.Maccy")
+  // Marks that copy was made from this application, independently of upstream Maccy.
+  static let fromMaccy = NSPasteboard.PasteboardType(rawValue: Bundle.main.bundleIdentifier ?? "io.damao.coldbrew")
 
   // Types that indicate Microsoft Word bookmarks (links).
   static let microsoftObjectLink = NSPasteboard.PasteboardType(rawValue: "com.microsoft.ObjectLink")

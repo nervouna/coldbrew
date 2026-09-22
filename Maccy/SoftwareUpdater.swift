@@ -2,23 +2,33 @@ import Sparkle
 
 @Observable
 class SoftwareUpdater {
-  var automaticallyChecksForUpdates = false {
-    didSet {
-      updater.automaticallyChecksForUpdates = automaticallyChecksForUpdates
+  var isAvailable: Bool { updater != nil }
+
+  var automaticallyChecksForUpdates: Bool {
+    get { updateChecksEnabled }
+    set {
+      updater?.automaticallyChecksForUpdates = newValue
     }
   }
 
-  private var updater: SPUUpdater
+  private var updateChecksEnabled = false
+  private var updater: SPUUpdater?
   private var automaticallyChecksForUpdatesObservation: NSKeyValueObservation?
-
-  private let updaterController = SPUStandardUpdaterController(
-    startingUpdater: true,
-    updaterDelegate: nil,
-    userDriverDelegate: nil
-  )
+  private var updaterController: SPUStandardUpdaterController?
 
   init() {
-    updater = updaterController.updater
+    // Coldbrew has no update feed until its own release channel is configured.
+    guard let feedURL = Bundle.main.object(forInfoDictionaryKey: "SUFeedURL") as? String,
+          !feedURL.isEmpty else { return }
+
+    let updaterController = SPUStandardUpdaterController(
+      startingUpdater: true,
+      updaterDelegate: nil,
+      userDriverDelegate: nil
+    )
+    self.updaterController = updaterController
+    let updater = updaterController.updater
+    self.updater = updater
     automaticallyChecksForUpdatesObservation = updater.observe(
       \.automaticallyChecksForUpdates,
       options: [.initial, .new, .old]
@@ -27,11 +37,11 @@ class SoftwareUpdater {
         return
       }
 
-      self.automaticallyChecksForUpdates = updater.automaticallyChecksForUpdates
+      self.updateChecksEnabled = updater.automaticallyChecksForUpdates
     }
   }
 
   func checkForUpdates() {
-    updater.checkForUpdates()
+    updater?.checkForUpdates()
   }
 }

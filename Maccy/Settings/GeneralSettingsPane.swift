@@ -26,10 +26,12 @@ struct GeneralSettingsPane: View {
         Toggle(isOn: $updater.automaticallyChecksForUpdates) {
           Text("CheckForUpdates", tableName: "GeneralSettings")
         }
+        .disabled(!updater.isAvailable)
         Button(
           action: { updater.checkForUpdates() },
           label: { Text("CheckNow", tableName: "GeneralSettings") }
         )
+        .disabled(!updater.isAvailable)
       }
 
       Settings.Section(label: { Text("Open", tableName: "GeneralSettings") }) {

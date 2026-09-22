@@ -6,5 +6,5 @@
 "ClearHistoryOnQuitTooltip" = "Automatiškai pašalinti visus neprisegtus elementus prieš išjungiant programą.";
 "ClearSystemClipboard" = "Taip pat išvalyti sistemos iškarpinę";
 "ClearSystemClipboardTooltip" = "Jei ši funkcija įjungta, istorijos ištrynimas taip pat ištrina dabartinę sistemos iškarpinę.";
-"TurnOffShellScript" = "defaults write org.p0deje.Maccy ignoreEvents true\n# kopijuoti duomenis\ndefaults write org.p0deje.Maccy ignoreEvents false";
-"TurnOffNextShellScript" = "defaults write org.p0deje.Maccy ignoreOnlyNextEvent true\n# kopijuoti duomenis";
+"TurnOffShellScript" = "defaults write io.damao.coldbrew ignoreEvents true\n# kopijuoti duomenis\ndefaults write io.damao.coldbrew ignoreEvents false";
+"TurnOffNextShellScript" = "defaults write io.damao.coldbrew ignoreOnlyNextEvent true\n# kopijuoti duomenis";

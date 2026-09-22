@@ -1,17 +1,13 @@
-> [!WARNING]
-> **Beware of fake websites impersonating Maccy.** Malicious sites (such as `maccyapp.net` and `maccyapp.com`) distribute malware disguised as Maccy. [**maccy.app**](https://maccy.app) is the **only** official website.
+# Coldbrew
 
-<img width="128px" src="https://maccy.app/img/maccy/Logo.png" alt="Logo" />
+Coldbrew is an independent fork of [Maccy](https://github.com/p0deje/Maccy),
+maintained at [nervouna/coldbrew](https://github.com/nervouna/coldbrew).
+It retains the upstream MIT license and attribution.
 
-# [Maccy](https://maccy.app)
-
-[![Downloads](https://img.shields.io/github/downloads/p0deje/Maccy/total.svg)](https://github.com/p0deje/Maccy/releases/latest)
-[![Build Status](https://img.shields.io/bitrise/716921b669780314/master?token=3pMiCb5dpFzlO-7jTYtO3Q)](https://app.bitrise.io/app/716921b669780314)
-
-Maccy is a lightweight clipboard manager for macOS. It keeps the history of what you copy
+Coldbrew is a lightweight clipboard manager for macOS. It keeps the history of what you copy
 and lets you quickly navigate, search, and use previous clipboard contents.
 
-Maccy works on macOS Sonoma 14 or higher.
+Coldbrew works on macOS Sonoma 14 or higher.
 
 <!-- vim-markdown-toc GFM -->
 
@@ -24,7 +20,7 @@ Maccy works on macOS Sonoma 14 or higher.
   * [Speed up Clipboard Check Interval](#speed-up-clipboard-check-interval)
 * [FAQ](#faq)
   * [Why doesn't it paste when I select an item in history?](#why-doesnt-it-paste-when-i-select-an-item-in-history)
-  * [When assigning a hotkey to open Maccy, it says that this hotkey is already used in some system setting.](#when-assigning-a-hotkey-to-open-maccy-it-says-that-this-hotkey-is-already-used-in-some-system-setting)
+  * [When assigning a hotkey to open Coldbrew, it says that this hotkey is already used in some system setting.](#when-assigning-a-hotkey-to-open-coldbrew-it-says-that-this-hotkey-is-already-used-in-some-system-setting)
   * [How to restore hidden footer?](#how-to-restore-hidden-footer)
   * [How to ignore copies from Universal Clipboard?](#how-to-ignore-copies-from-universal-clipboard)
   * [My keyboard shortcut stopped working in password fields. How do I fix this?](#my-keyboard-shortcut-stopped-working-in-password-fields-how-do-i-fix-this)
@@ -44,15 +40,18 @@ Maccy works on macOS Sonoma 14 or higher.
 
 ## Install
 
-Download the latest version from the [releases](https://github.com/p0deje/Maccy/releases/latest) page, or use [Homebrew](https://brew.sh/):
+Coldbrew is currently built from source. Open `Maccy.xcodeproj` in Xcode and
+select the `Maccy` scheme to build `Coldbrew.app`. The internal project and
+module names are retained for compatibility with upstream.
 
-```sh
-brew install maccy
-```
+The application uses bundle identifier `io.damao.coldbrew` and keeps its history
+separate from Maccy. In-app update checks are disabled until a Coldbrew release
+channel is configured. Report Coldbrew issues in
+[this repository](https://github.com/nervouna/coldbrew/issues).
 
 ## Usage
 
-1. <kbd>SHIFT (⇧)</kbd> + <kbd>COMMAND (⌘)</kbd> + <kbd>C</kbd> to popup Maccy or click on its icon in the menu bar.
+1. <kbd>SHIFT (⇧)</kbd> + <kbd>COMMAND (⌘)</kbd> + <kbd>C</kbd> to popup Coldbrew or click on its icon in the menu bar.
 2. Type what you want to find.
 3. To select the history item you wish to copy, press <kbd>ENTER</kbd>, or click the item, or use <kbd>COMMAND (⌘)</kbd> + `n` shortcut.
 4. To choose the history item and paste, press <kbd>OPTION (⌥)</kbd> + <kbd>ENTER</kbd>, or <kbd>OPTION (⌥)</kbd> + <kbd>CLICK</kbd> the item, or use <kbd>OPTION (⌥)</kbd> + `n` shortcut.
@@ -61,7 +60,7 @@ brew install maccy
 7. To see the full text of the history item, wait a couple of seconds for tooltip.
 8. To pin the history item so that it remains on top of the list, press <kbd>OPTION (⌥)</kbd> + <kbd>P</kbd>. The item will be moved to the top with a random but permanent keyboard shortcut. To unpin it, press <kbd>OPTION (⌥)</kbd> + <kbd>P</kbd> again.
 9. To clear all unpinned items, select _Clear_ in the menu, or press <kbd>OPTION (⌥)</kbd> + <kbd>COMMAND (⌘)</kbd> + <kbd>DELETE (⌫)</kbd>. To clear all items including pinned, select _Clear_ in the menu with  <kbd>OPTION (⌥)</kbd> pressed, or press <kbd>SHIFT (⇧)</kbd> + <kbd>OPTION (⌥)</kbd> + <kbd>COMMAND (⌘)</kbd> + <kbd>DELETE (⌫)</kbd>.
-10. To disable Maccy and ignore new copies, click on the menu icon with <kbd>OPTION (⌥)</kbd> pressed.
+10. To disable Coldbrew and ignore new copies, click on the menu icon with <kbd>OPTION (⌥)</kbd> pressed.
 11. To ignore only the next copy, click on the menu icon with <kbd>OPTION (⌥)</kbd> + <kbd>SHIFT (⇧)</kbd> pressed.
 12. To customize the behavior, check "Preferences…" window, or press <kbd>COMMAND (⌘)</kbd> + <kbd>,</kbd>.
 
@@ -69,10 +68,10 @@ brew install maccy
 
 ### Ignore Copied Items
 
-You can tell Maccy to ignore all copied items:
+You can tell Coldbrew to ignore all copied items:
 
 ```sh
-defaults write org.p0deje.Maccy ignoreEvents true # default is false
+defaults write io.damao.coldbrew ignoreEvents true # default is false
 ```
 
 This is useful if you have some workflow for copying sensitive data. You can set `ignoreEvents` to true, copy the data and set `ignoreEvents` back to false.
@@ -81,7 +80,7 @@ You can also click the menu icon with <kbd>OPTION (⌥)</kbd> pressed. To ignore
 
 ### Ignore Custom Copy Types
 
-By default Maccy will ignore certain copy types that are considered to be confidential
+By default Coldbrew will ignore certain copy types that are considered to be confidential
 or temporary. The default list always include the following types:
 
 * `org.nspasteboard.TransientType`
@@ -106,11 +105,11 @@ of using this approach to ignore Adobe InDesign](https://github.com/p0deje/Maccy
 
 ### Speed up Clipboard Check Interval
 
-By default, Maccy checks clipboard every 500 ms, which should be enough for most users. If you want
+By default, Coldbrew checks clipboard every 500 ms, which should be enough for most users. If you want
 to speed it up, you can change it with `defaults`:
 
 ```sh
-defaults write org.p0deje.Maccy clipboardCheckInterval 0.1 # 100 ms
+defaults write io.damao.coldbrew clipboardCheckInterval 0.1 # 100 ms
 ```
 
 ## FAQ
@@ -118,26 +117,26 @@ defaults write org.p0deje.Maccy clipboardCheckInterval 0.1 # 100 ms
 ### Why doesn't it paste when I select an item in history?
 
 1. Make sure you have "Paste automatically" enabled in Preferences.
-2. Make sure "Maccy" is added to System Settings -> Privacy & Security -> Accessibility.
+2. Make sure "Coldbrew" is added to System Settings -> Privacy & Security -> Accessibility.
 
-### When assigning a hotkey to open Maccy, it says that this hotkey is already used in some system setting.
+### When assigning a hotkey to open Coldbrew, it says that this hotkey is already used in some system setting.
 
 1. Open System settings -> Keyboard -> Keyboard Shortcuts.
 2. Find where that hotkey is used. For example, "Convert text to simplified Chinese" is under Services -> Text.
 3. Disable that hotkey or remove assigned combination ([screenshot](https://github.com/p0deje/Maccy/assets/576152/446719e6-c3e5-4eb0-95fb-5a811066487f)).
-4. Restart Maccy.
-5. Assign hotkey in Maccy settings.
+4. Restart Coldbrew.
+5. Assign hotkey in Coldbrew settings.
 
 ### How to restore hidden footer?
 
-1. Open Maccy window.
+1. Open Coldbrew window.
 2. Press <kbd>COMMAND (⌘)</kbd> + <kbd>,</kbd> to open preferences.
 3. Enable footer in Appearance section.
 
 If for some reason it doesn't work, run the following command in Terminal.app:
 
 ```sh
-defaults write org.p0deje.Maccy showFooter 1
+defaults write io.damao.coldbrew showFooter 1
 ```
 
 ### How to ignore copies from [Universal Clipboard](https://support.apple.com/en-us/102430)?
@@ -157,6 +156,8 @@ You can use it to suggest changes in translations and localize the application t
 [![Translation status](https://hosted.weblate.org/widget/maccy/multi-auto.svg)](https://hosted.weblate.org/engage/maccy/)
 
 ## Motivation
+
+The following motivation is from the original Maccy author:
 
 There are dozens of similar applications out there, so why build another?
 Over the past years since I moved from Linux to macOS, I struggled to find
