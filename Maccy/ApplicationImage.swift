@@ -1,6 +1,7 @@
 import Defaults
 import SwiftUI
 
+@MainActor
 class ApplicationImage {
   fileprivate static let fallbackImage = NSImage(
     systemSymbolName: "questionmark.app.dashed",
@@ -50,11 +51,12 @@ class ApplicationImage {
         let source = DispatchSource.makeFileSystemObjectSource(
           fileDescriptor: descriptor,
           eventMask: [.write, .delete],
-          queue: DispatchQueue.global()
+          queue: DispatchQueue.main
         )
         eventSource = source
         source.setEventHandler {
-          DispatchQueue.main.async {
+          // The source delivers this handler on its explicit main queue.
+          MainActor.assumeIsolated {
             let event = source.data
             if event.contains(.delete) {
               // File was deleted.

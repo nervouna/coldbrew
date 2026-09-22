@@ -4,8 +4,8 @@ import AppIntents
 struct Get: AppIntent, CustomIntentMigratedAppIntent {
   static let intentClassName = "GetIntent"
 
-  static var title: LocalizedStringResource = "Get Item from Clipboard History"
-  static var description = IntentDescription("""
+  static let title: LocalizedStringResource = "Get Item from Clipboard History"
+  static let description = IntentDescription("""
   Gets an item from Coldbrew clipboard history.
   The returned item can be used to access its plain/rich/HTML text, image contents or file location.
   """)
@@ -31,6 +31,7 @@ struct Get: AppIntent, CustomIntentMigratedAppIntent {
     }
   }
 
+  @MainActor
   func perform() async throws -> some IntentResult & ReturnsValue<HistoryItemAppEntity> {
     var item: HistoryItem?
     if selected {

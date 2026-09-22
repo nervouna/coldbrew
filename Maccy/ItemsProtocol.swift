@@ -1,7 +1,9 @@
+@MainActor
 protocol HasVisibility {
   var isVisible: Bool { get }
 }
 
+@MainActor
 protocol ItemsContainer {
   associatedtype Item
   var containerVisible: Bool { get }

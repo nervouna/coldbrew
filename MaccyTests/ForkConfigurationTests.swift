@@ -2,6 +2,7 @@ import AppKit
 import XCTest
 @testable import Maccy
 
+@MainActor
 final class ForkConfigurationTests: XCTestCase {
   func testHostUsesColdbrewIdentity() {
     XCTAssertEqual(Bundle.main.bundleIdentifier, "io.damao.coldbrew")

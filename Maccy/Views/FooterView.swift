@@ -19,6 +19,7 @@ struct FooterView: View {
   }
 
   var body: some View {
+    @Bindable var appState = appState
     VStack(spacing: 0) {
       Divider()
         .padding(.horizontal, Popup.horizontalSeparatorPadding)
@@ -57,6 +58,6 @@ struct FooterView: View {
     .invisible(!showFooter)
     .frame(maxHeight: showFooter ? nil : 0)
     .padding(.bottom, showFooter ? Popup.verticalPadding : 0)
-    .readHeight(appState, into: \.popup.footerHeight)
+    .readHeight($appState.popup.footerHeight)
   }
 }

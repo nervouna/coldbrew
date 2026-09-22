@@ -6,6 +6,7 @@ import Vision
 
 @Model
 class HistoryItem {
+  @MainActor
   static var supportedPins: Set<String> {
     // "a" reserved for select all
     // "q" reserved for quit
@@ -92,10 +93,11 @@ class HistoryItem {
       }
   }
 
+  @MainActor
   func generateTitle() -> String {
     guard image == nil else {
       Task {
-        self.performTextRecognition()
+        await self.performTextRecognition()
       }
       return ""
     }
@@ -231,31 +233,38 @@ class HistoryItem {
       .compactMap { $0.value }
   }
 
-  private func performTextRecognition() {
-    guard let cgImage = image?.cgImage(forProposedRect: nil, context: nil, hints: nil) else {
+  @MainActor
+  func performTextRecognition(
+    using recognize: @escaping @Sendable (Data) -> String? = ImageTextRecognition.recognize
+  ) async {
+    guard let context = modelContext, !isDeleted, let data = imageData else {
       return
     }
 
-    let requestHandler = VNImageRequestHandler(cgImage: cgImage)
-    let request = VNRecognizeTextRequest(completionHandler: recognizeTextHandler)
+    // Only image bytes leave the main context; Vision and its results stay in the worker.
+    let recognizedText = await Task.detached(priority: .utility) {
+      recognize(data)
+    }.value
+
+    // A copy may have been removed or merged while recognition was running.
+    guard modelContext === context, !isDeleted, let recognizedText else { return }
+    title = recognizedText
+  }
+}
+
+enum ImageTextRecognition {
+  static func recognize(_ data: Data) -> String? {
+    let requestHandler = VNImageRequestHandler(data: data)
+    let request = VNRecognizeTextRequest()
     request.recognitionLevel = .fast
 
     do {
+      // perform waits for completion, so no Vision callback needs to access a model.
       try requestHandler.perform([request])
+      return request.results?.compactMap { $0.topCandidates(1).first?.string }.joined(separator: "\n")
     } catch {
       print("Unable to perform the request: \(error).")
+      return nil
     }
-  }
-
-  private func recognizeTextHandler(request: VNRequest, error: Error?) {
-    guard let observations = request.results as? [VNRecognizedTextObservation] else {
-      return
-    }
-
-    let recognizedStrings = observations.compactMap { observation in
-      return observation.topCandidates(1).first?.string
-    }
-
-    self.title = recognizedStrings.joined(separator: "\n")
   }
 }

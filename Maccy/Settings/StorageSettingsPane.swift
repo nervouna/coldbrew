@@ -4,6 +4,7 @@ import Settings
 
 struct StorageSettingsPane: View {
   @Observable
+  @MainActor
   class ViewModel {
     var saveFiles = false {
       didSet {
@@ -44,14 +45,17 @@ struct StorageSettingsPane: View {
     private var observer: Defaults.Observation?
 
     init() {
-      observer = Defaults.observe(.enabledPasteboardTypes) { change in
-        self.saveFiles = change.newValue.isSuperset(of: StorageType.files.types)
-        self.saveImages = change.newValue.isSuperset(of: StorageType.images.types)
-        self.saveText = change.newValue.isSuperset(of: StorageType.text.types)
+      observer = Defaults.observe(.enabledPasteboardTypes) { [weak self] _ in
+        Task { @MainActor in
+          let enabledTypes = Defaults[.enabledPasteboardTypes]
+          self?.saveFiles = enabledTypes.isSuperset(of: StorageType.files.types)
+          self?.saveImages = enabledTypes.isSuperset(of: StorageType.images.types)
+          self?.saveText = enabledTypes.isSuperset(of: StorageType.text.types)
+        }
       }
     }
 
-    deinit {
+    isolated deinit {
       observer?.invalidate()
     }
   }

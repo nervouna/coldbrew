@@ -27,7 +27,7 @@ struct SlideoutView<Content, Slideout>: View
 where Content: View, Slideout: View {
   @Environment(AppState.self) private var appState
 
-  let controller: SlideoutController
+  @Bindable var controller: SlideoutController
 
   @ViewBuilder var content: () -> Content
   @ViewBuilder var slideout: () -> Slideout
@@ -111,7 +111,7 @@ where Content: View, Slideout: View {
         horizontal: isAnimating || isSlideoutResizing,
         vertical: false
       )
-      .readWidth(controller, into: \.contentResizeWidth)
+      .readWidth($controller.contentResizeWidth)
 
       resizeDivider()
 
@@ -141,7 +141,7 @@ where Content: View, Slideout: View {
       .clipped()
       // Prevent closed slideout from blocking hover events on content items (#1484)
       .allowsHitTesting(controller.state != .closed)
-      .readWidth(controller, into: \.slideoutResizeWidth)
+      .readWidth($controller.slideoutResizeWidth)
     }
     .environment(\.layoutDirection, leftToRight ? .leftToRight : .rightToLeft)
   }

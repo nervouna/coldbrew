@@ -3,6 +3,7 @@ import Defaults
 @testable import Maccy
 
 // swiftlint:disable type_body_length
+@MainActor
 class ClipboardTests: XCTestCase {
   let clipboard = Clipboard.shared
   let pasteboard = NSPasteboard.general
@@ -26,14 +27,14 @@ class ClipboardTests: XCTestCase {
   let savedIgnoredApps = Defaults[.ignoredApps]
   let savedIgnoredPasteboardTypes = Defaults[.ignoredPasteboardTypes]
 
-  override func setUp() {
-    super.setUp()
+  override func setUp() async throws {
+    try await super.setUp()
     Defaults[.ignoreAllAppsExceptListed] = false
     Defaults[.ignoreEvents] = false
   }
 
-  override func tearDown() {
-    super.tearDown()
+  override func tearDown() async throws {
+    try await super.tearDown()
     Defaults[.enabledPasteboardTypes] = savedEnabledTypes
     Defaults[.ignoreEvents] = savedIgnoreEvents
     Defaults[.ignoreOnlyNextEvent] = false
@@ -136,31 +137,34 @@ class ClipboardTests: XCTestCase {
     XCTAssertFalse(Defaults[.ignoreOnlyNextEvent])
   }
 
-  func testIgnoreApplication() {
-    Defaults[.ignoredApps] = ["com.apple.dt.Xcode", "com.apple.finder"] // Finder is on Bitrise
+  func testIgnoreApplication() throws {
+    let sourceBundle = try XCTUnwrap(NSWorkspace.shared.frontmostApplication?.bundleIdentifier)
+    Defaults[.ignoredApps] = [sourceBundle]
 
     let hookExpectation = expectation(description: "Hook is called")
     hookExpectation.isInverted = true
     clipboard.onNewCopy({ (_: HistoryItem) in
       hookExpectation.fulfill()
     })
-    clipboard.start()
     pasteboard.declareTypes([.string], owner: nil)
     pasteboard.setString("bar", forType: .string)
+    // Poll synchronously so a focus change while waiting cannot change the fixture's source app.
+    clipboard.checkForChangesInPasteboard()
     waitForExpectations(timeout: 2)
   }
 
-  func testIgnoreAllApplicationsExcept() {
+  func testIgnoreAllApplicationsExcept() throws {
+    let sourceBundle = try XCTUnwrap(NSWorkspace.shared.frontmostApplication?.bundleIdentifier)
     Defaults[.ignoreAllAppsExceptListed] = true
-    Defaults[.ignoredApps] = ["com.apple.dt.Xcode", "com.apple.finder"] // Finder is on Bitrise
+    Defaults[.ignoredApps] = [sourceBundle]
 
     let hookExpectation = expectation(description: "Hook is called")
     clipboard.onNewCopy({ (_: HistoryItem) in
       hookExpectation.fulfill()
     })
-    clipboard.start()
     pasteboard.declareTypes([.string], owner: nil)
     pasteboard.setString("bar", forType: .string)
+    clipboard.checkForChangesInPasteboard()
     waitForExpectations(timeout: 2)
   }
 

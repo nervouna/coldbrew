@@ -12,6 +12,7 @@ struct HeaderView: View {
   }
 
   var body: some View {
+    @Bindable var appState = appState
     HStack(alignment: .top, spacing: 0) {
       HStack(alignment: .center, spacing: 0) {
         ListHeaderView(
@@ -45,6 +46,6 @@ struct HeaderView: View {
     .animation(.default.speed(3), value: appState.navigator.leadSelection)
     .background(.clear)
     .frame(maxHeight: !appState.searchVisible ? 0 : nil, alignment: .top)
-    .readHeight(appState, into: \.popup.headerHeight)
+    .readHeight($appState.popup.headerHeight)
   }
 }

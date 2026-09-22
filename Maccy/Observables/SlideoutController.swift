@@ -63,6 +63,7 @@ enum ResizingMode {
 }
 
 @Observable
+@MainActor
 class SlideoutController {
   let logger = Logger(label: "io.damao.coldbrew")
   private static let animationDuration = 0.25

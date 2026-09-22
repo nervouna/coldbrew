@@ -1,7 +1,8 @@
 import SwiftUI
 
 @Observable
-class FooterItem: Equatable, Identifiable, HasVisibility {
+@MainActor
+class FooterItem: @MainActor Equatable, Identifiable, HasVisibility {
   struct Confirmation {
     var message: LocalizedStringKey
     var comment: LocalizedStringKey
@@ -23,7 +24,7 @@ class FooterItem: Equatable, Identifiable, HasVisibility {
   var showConfirmation: Bool = false
   var suppressConfirmation: Binding<Bool>?
   var isVisible: Bool = true
-  var action: () -> Void
+  var action: @MainActor () -> Void
 
   init(
     title: String,
@@ -31,7 +32,7 @@ class FooterItem: Equatable, Identifiable, HasVisibility {
     help: LocalizedStringKey? = nil,
     confirmation: Confirmation? = nil,
     suppressConfirmation: Binding<Bool>? = nil,
-    action: @escaping () -> Void
+    action: @escaping @MainActor () -> Void
   ) {
     self.title = title
     self.shortcuts = shortcuts

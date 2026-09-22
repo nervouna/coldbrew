@@ -1,5 +1,6 @@
 import XCTest
 import Defaults
+import Observation
 @testable import Maccy
 
 // swiftlint:disable force_try
@@ -60,6 +61,67 @@ class HistoryItemTests: XCTestCase {
     let image = NSImage(named: "NSBluetoothTemplate")!
     let item = historyItem(image)
     XCTAssertEqual(item.title, "")
+  }
+
+  func testImageRecognitionUpdatesStoredTitle() async throws {
+    let item = try textRecognitionItem()
+    let decorator = HistoryItemDecorator(item)
+    let titleChanged = expectation(description: "Decorator observes the recognized title")
+    withObservationTracking {
+      _ = decorator.title
+    } onChange: {
+      titleChanged.fulfill()
+    }
+
+    await item.performTextRecognition()
+    XCTAssertEqual(item.title, "COLDBREW")
+    await fulfillment(of: [titleChanged], timeout: 3)
+    XCTAssertEqual(decorator.title, item.title)
+  }
+
+  func testImageRecognitionDoesNotUpdateDeletedItem() async throws {
+    let item = try textRecognitionItem()
+    let started = expectation(description: "Recognition started outside the main actor")
+    let resume = DispatchSemaphore(value: 0)
+    let recognition = Task {
+      await item.performTextRecognition { _ in
+        XCTAssertFalse(Thread.isMainThread)
+        started.fulfill()
+        XCTAssertEqual(resume.wait(timeout: .now() + 5), .success)
+        return "REMOVED COPY"
+      }
+    }
+    await fulfillment(of: [started], timeout: 3)
+    Storage.shared.context.delete(item)
+    try Storage.shared.context.save()
+    resume.signal()
+    await recognition.value
+    XCTAssertEqual(item.title, "")
+  }
+
+  func testImageRecognitionRejectsInvalidDataOffMainActor() async {
+    let result = await Task.detached {
+      XCTAssertFalse(Thread.isMainThread)
+      return ImageTextRecognition.recognize(Data("not an image".utf8))
+    }.value
+    XCTAssertNil(result)
+  }
+
+  private func textRecognitionItem() throws -> HistoryItem {
+    let image = NSImage(size: NSSize(width: 800, height: 160), flipped: false) { rect in
+      NSColor.white.setFill()
+      rect.fill()
+      let text = NSAttributedString(string: "COLDBREW", attributes: [
+        .font: NSFont.systemFont(ofSize: 64),
+        .foregroundColor: NSColor.black
+      ])
+      text.draw(at: NSPoint(x: 40, y: 45))
+      return true
+    }
+    let data = try XCTUnwrap(image.tiffRepresentation)
+    let item = HistoryItem(contents: [HistoryItemContent(type: NSPasteboard.PasteboardType.tiff.rawValue, value: data)])
+    Storage.shared.context.insert(item)
+    return item
   }
 
   func testFile() {

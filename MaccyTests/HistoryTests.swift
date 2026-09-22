@@ -10,16 +10,16 @@ class HistoryTests: XCTestCase { // swiftlint:disable:this type_body_length
   let savedPinTo = Defaults[.pinTo]
   let history = History.shared
 
-  override func setUp() {
-    super.setUp()
+  override func setUp() async throws {
+    try await super.setUp()
     history.clearAll()
     Defaults[.size] = 10
     Defaults[.sortBy] = .firstCopiedAt
     Defaults[.pinTo] = .bottom
   }
 
-  override func tearDown() {
-    super.tearDown()
+  override func tearDown() async throws {
+    try await super.tearDown()
     Defaults[.size] = savedSize
     Defaults[.sortBy] = savedSortBy
     Defaults[.pinTo] = savedPinTo

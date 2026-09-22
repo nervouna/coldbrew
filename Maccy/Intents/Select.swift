@@ -3,8 +3,8 @@ import AppIntents
 struct Select: AppIntent, CustomIntentMigratedAppIntent {
   static let intentClassName = "SelectIntent"
 
-  static var title: LocalizedStringResource = "Select Item in Clipboard History"
-  static var description = IntentDescription("""
+  static let title: LocalizedStringResource = "Select Item in Clipboard History"
+  static let description = IntentDescription("""
   Selects an item in Coldbrew clipboard history.
   Depending on Coldbrew settings, it might trigger pasting of the selected item.
   """)
@@ -18,6 +18,7 @@ struct Select: AppIntent, CustomIntentMigratedAppIntent {
 
   private let positionOffset = 1
 
+  @MainActor
   func perform() async throws -> some IntentResult & ReturnsValue<String> {
     let items = AppState.shared.history.items
     let index = number - positionOffset
@@ -26,7 +27,7 @@ struct Select: AppIntent, CustomIntentMigratedAppIntent {
     }
 
     let value = items[index].title
-    await AppState.shared.history.select(items[index], flags: .currentModifierFlags)
+    AppState.shared.history.select(items[index], flags: .currentModifierFlags)
 
     return .result(value: value)
   }

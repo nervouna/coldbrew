@@ -5,7 +5,8 @@ import Observation
 import Sauce
 
 @Observable
-class HistoryItemDecorator: Identifiable, Hashable, HasVisibility {
+@MainActor
+class HistoryItemDecorator: Identifiable, @MainActor Hashable, HasVisibility {
   static func == (lhs: HistoryItemDecorator, rhs: HistoryItemDecorator) -> Bool {
     return lhs.id == rhs.id
   }

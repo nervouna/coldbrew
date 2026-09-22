@@ -2,8 +2,9 @@ import Defaults
 import KeyboardShortcuts
 import SwiftUI
 
+@MainActor
 class AppDelegate: NSObject, NSApplicationDelegate {
-  static let isTesting = CommandLine.arguments.contains("enable-testing")
+  nonisolated static let isTesting = CommandLine.arguments.contains("enable-testing")
   var panel: FloatingPanel<ContentView>!
 
   @objc
@@ -210,7 +211,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     NotificationCenter.default.addObserver(
       forName: Notification.Name("KeyboardShortcuts_shortcutByNameDidChange"),
       object: nil,
-      queue: nil
+      queue: .main
     ) { notification in
       if let name = notification.userInfo?["name"] as? KeyboardShortcuts.Name, names.contains(name) {
         KeyboardShortcuts.disable(name)

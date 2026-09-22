@@ -2,6 +2,7 @@ import Foundation
 import SwiftUI
 
 @Observable
+@MainActor
 class NavigationManager { // swiftlint:disable:this type_body_length
   private var history: History
   private var footer: Footer

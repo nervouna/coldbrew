@@ -20,14 +20,14 @@ class HistoryItemDecoratorTests: XCTestCase {
     return formatter.date(from: "2020/07/10 12:41:34")
   }
 
-  override func setUp() {
-    super.setUp()
+  override func setUp() async throws {
+    try await super.setUp()
     Defaults[.highlightMatch] = .bold
     Defaults[.imageMaxHeight] = 40
   }
 
-  override func tearDown() {
-    super.tearDown()
+  override func tearDown() async throws {
+    try await super.tearDown()
     Defaults[.imageMaxHeight] = savedImageMaxHeight
     Defaults[.highlightMatch] = savedHighlightMatch
   }

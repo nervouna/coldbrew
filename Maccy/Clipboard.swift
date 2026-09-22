@@ -2,10 +2,11 @@ import AppKit
 import Defaults
 import Sauce
 
+@MainActor
 class Clipboard {
   static let shared = Clipboard()
 
-  typealias OnNewCopyHook = (HistoryItem) -> Void
+  typealias OnNewCopyHook = @MainActor (HistoryItem) -> Void
 
   private var onNewCopyHooks: [OnNewCopyHook] = []
   var changeCount: Int

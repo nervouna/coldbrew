@@ -17,11 +17,11 @@ extension Defaults.Keys {
 
   // When UI tests run with the `enable-testing` argument, window and pin
   // preferences are stored in a separate xcuitest bundle
-  private static let preferencesSuite: UserDefaults = AppDelegate.isTesting
-    ? (UserDefaults(suiteName: testingSuiteName) ?? .standard)
-    : .standard
+  private static var preferencesSuite: UserDefaults {
+    AppDelegate.isTesting ? (UserDefaults(suiteName: testingSuiteName) ?? .standard) : .standard
+  }
 #else
-  private static let preferencesSuite: UserDefaults = .standard
+  private static var preferencesSuite: UserDefaults { .standard }
 #endif
 
   static let clearOnQuit = Key<Bool>("clearOnQuit", default: false, suite: preferencesSuite)

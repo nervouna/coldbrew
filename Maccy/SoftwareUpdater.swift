@@ -1,6 +1,7 @@
 import Sparkle
 
 @Observable
+@MainActor
 class SoftwareUpdater {
   var isAvailable: Bool { updater != nil }
 
@@ -32,12 +33,14 @@ class SoftwareUpdater {
     automaticallyChecksForUpdatesObservation = updater.observe(
       \.automaticallyChecksForUpdates,
       options: [.initial, .new, .old]
-    ) { [unowned self] updater, change in
-      guard change.newValue != change.oldValue else {
+    ) { [weak self] _, change in
+      guard let enabled = change.newValue, enabled != change.oldValue else {
         return
       }
 
-      self.updateChecksEnabled = updater.automaticallyChecksForUpdates
+      Task { @MainActor in
+        self?.updateChecksEnabled = enabled
+      }
     }
   }
 

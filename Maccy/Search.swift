@@ -2,6 +2,7 @@ import AppKit
 import Defaults
 import Fuse
 
+@MainActor
 class Search {
   enum Mode: String, CaseIterable, Identifiable, CustomStringConvertible, Defaults.Serializable {
     case exact
@@ -25,7 +26,8 @@ class Search {
     }
   }
 
-  struct SearchResult: Equatable {
+  @MainActor
+  struct SearchResult: @MainActor Equatable {
     var score: Double?
     var object: Searchable
     var ranges: [Range<String.Index>] = []

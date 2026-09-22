@@ -3,6 +3,7 @@ import XCTest
 
 // swiftlint:disable file_length
 // swiftlint:disable type_body_length
+@MainActor
 private struct HistoryItemQuery {
   let query: XCUIElementQuery
 
@@ -17,6 +18,7 @@ private struct HistoryItemQuery {
   }
 }
 
+@MainActor
 class MaccyUITests: XCTestCase {
   let app = XCUIApplication()
   let pasteboard = NSPasteboard.general
@@ -56,8 +58,8 @@ class MaccyUITests: XCTestCase {
       .compactMap { $0.label.components(separatedBy: ", ").first }
   }
 
-  override func setUp() {
-    super.setUp()
+  override func setUp() async throws {
+    try await super.setUp()
 
     try? "Hello world".write(to: file1, atomically: true, encoding: .utf8)
     try? "Hello world".write(to: file2, atomically: true, encoding: .utf8)
@@ -74,8 +76,8 @@ class MaccyUITests: XCTestCase {
 
   }
 
-  override func tearDown() {
-    super.tearDown()
+  override func tearDown() async throws {
+    try await super.tearDown()
     app.terminate()
   }
 

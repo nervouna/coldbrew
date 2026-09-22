@@ -2,6 +2,7 @@ import Defaults
 import SwiftUI
 
 @Observable
+@MainActor
 class Footer: ItemsContainer {
   var items: [FooterItem] = []
 

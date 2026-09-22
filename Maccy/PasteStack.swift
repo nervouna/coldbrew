@@ -2,7 +2,8 @@ import Foundation
 import AppKit
 
 @Observable
-class PasteStack: Identifiable, Hashable {
+@MainActor
+class PasteStack: Identifiable, @MainActor Hashable {
   private static var listener: Any?
 
   static func initializeIfNeeded() {
@@ -11,24 +12,27 @@ class PasteStack: Identifiable, Hashable {
 
     var pasteDown: Bool = false
     listener = NSEvent.addGlobalMonitorForEvents(matching: [.keyUp, .keyDown]) { event in
-      switch event.type {
-      case .keyDown:
-        if event.keyCode == KeyChord.pasteKey.QWERTYKeyCode
-           && event.modifierFlags.intersection(.deviceIndependentFlagsMask) == [.command] {
-          pasteDown = true
+      // AppKit invokes global event monitors on the main thread.
+      MainActor.assumeIsolated {
+        switch event.type {
+        case .keyDown:
+          if event.keyCode == KeyChord.pasteKey.QWERTYKeyCode
+             && event.modifierFlags.intersection(.deviceIndependentFlagsMask) == [.command] {
+            pasteDown = true
+          }
+        case .keyUp:
+          if pasteDown && event.keyCode == KeyChord.pasteKey.QWERTYKeyCode {
+            pasteDown = false
+            AppState.shared.history.handlePasteStack()
+          }
+        default:
+          break
         }
-      case .keyUp:
-        if pasteDown && event.keyCode == KeyChord.pasteKey.QWERTYKeyCode {
-          pasteDown = false
-          AppState.shared.history.handlePasteStack()
-        }
-      default:
-        break
       }
     }
   }
 
-  var id: UUID = UUID()
+  let id: UUID = UUID()
   var items: [HistoryItemDecorator] = []
   var modifierFlags: NSEvent.ModifierFlags
 

@@ -27,11 +27,12 @@ class Notifier {
       }
 
       let request = UNNotificationRequest(identifier: UUID().uuidString, content: content, trigger: nil)
+      let soundEnabled = settings.soundSetting == .enabled
       center.add(request) { error in
         if error != nil {
           NSLog("Failed to deliver notification: \(String(describing: error))")
         } else {
-          if settings.soundSetting == .enabled {
+          if soundEnabled {
             sound?.play()
           }
         }

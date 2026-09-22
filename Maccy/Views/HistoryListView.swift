@@ -66,6 +66,7 @@ struct HistoryListView: View {
   }
 
   var body: some View {
+    @Bindable var appState = appState
     let topPinsVisible = pinTo == .top && pinsVisible
     let bottomPinsVisible = pinTo == .bottom && pinsVisible
     let historyEmpty = unpinnedItems.isEmpty
@@ -96,7 +97,7 @@ struct HistoryListView: View {
       }
     }
     .padding(.top, topSeparatorVisible ? topPadding : 0)
-    .readHeight(appState, into: \.popup.extraTopHeight)
+    .readHeight($appState.popup.extraTopHeight)
 
     ScrollView {
       ScrollViewReader { proxy in
@@ -161,6 +162,6 @@ struct HistoryListView: View {
       }
     }
     .padding(.bottom, bottomPinsVisible ? bottomPadding : 0)
-    .readHeight(appState, into: \.popup.extraBottomHeight)
+    .readHeight($appState.popup.extraBottomHeight)
   }
 }

@@ -3,8 +3,11 @@ import KeyboardShortcuts
 import Sauce
 
 enum KeyChord: CaseIterable {
+  @MainActor
   static var pasteKey: Key { pasteMenuItem?.key ?? Key.v }
+  @MainActor
   static var pasteKeyModifiers: NSEvent.ModifierFlags { pasteMenuItem?.keyEquivalentModifierMask ?? .command }
+  @MainActor
   private static var pasteMenuItem: NSMenuItem? {
     NSApp.mainMenu?.items
       .flatMap { $0.submenu?.items ?? [] }
@@ -42,6 +45,7 @@ enum KeyChord: CaseIterable {
   case togglePreview
   case unknown
 
+  @MainActor
   init(_ event: NSEvent?) {
     guard let event, event.type == .keyDown else {
       self = .unknown
@@ -68,6 +72,7 @@ enum KeyChord: CaseIterable {
   }
 
   // swiftlint:disable:next cyclomatic_complexity function_body_length
+  @MainActor
   init(_ key: Key, _ modifierFlags: NSEvent.ModifierFlags) {
     switch (key, modifierFlags) {
     case (.delete, [.command, .option]):

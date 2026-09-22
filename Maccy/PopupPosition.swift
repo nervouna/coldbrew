@@ -26,6 +26,7 @@ enum PopupPosition: String, CaseIterable, Identifiable, CustomStringConvertible,
     }
   }
 
+  @MainActor
   func origin(size: NSSize, statusBarButton: NSStatusBarButton?) -> NSPoint {
     switch self {
     case .center:

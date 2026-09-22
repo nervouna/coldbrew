@@ -16,6 +16,7 @@ enum PopupState {
 }
 
 @Observable
+@MainActor
 class Popup {
   static let verticalSeparatorPadding = 6.0
   static let horizontalSeparatorPadding = 6.0
@@ -58,7 +59,7 @@ class Popup {
     initEventsMonitor()
   }
 
-  deinit {
+  isolated deinit {
     deinitEventsMonitor()
   }
 
@@ -67,7 +68,14 @@ class Popup {
 
     self.eventsMonitor = NSEvent.addLocalMonitorForEvents(
       matching: [.flagsChanged, .keyDown],
-      handler: handleEvent
+      handler: { [weak self] event in
+        // AppKit invokes local event monitors on the main thread; filtering must remain synchronous.
+        let shouldPassThrough = MainActor.assumeIsolated {
+          guard let self else { return true }
+          return self.handleEvent(event) != nil
+        }
+        return shouldPassThrough ? event : nil
+      }
     )
   }
 
@@ -75,6 +83,7 @@ class Popup {
     guard let eventsMonitor else { return }
 
     NSEvent.removeMonitor(eventsMonitor)
+    self.eventsMonitor = nil
   }
 
   func open(height: CGFloat, at popupPosition: PopupPosition = Defaults[.popupPosition]) {
