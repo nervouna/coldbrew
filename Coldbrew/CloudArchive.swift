@@ -510,9 +510,13 @@ final class CloudArchive {
       activeTransport = transport
       let account = try await transport.account()
       guard enabled, fence == generation else { return }
-      if state.account != account {
-        guard state.account == nil || approveAccount else { pauseForAccountChange(); return }
-        // A new account receives only currently visible local data, never the old account's retained ledger.
+      if state.account == nil {
+        // First connection binds the durable offline journal, including local eviction suppression.
+        state.account = account
+        try persist()
+      } else if state.account != account {
+        guard approveAccount else { pauseForAccountChange(); return }
+        // A different account receives visible local data, never the previous account's retained ledger.
         state = LocalState(account: account)
         try persist()
       }

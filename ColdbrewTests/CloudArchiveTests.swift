@@ -341,6 +341,56 @@ func testRecordConflictSurvivesOperationErrorWrapping() {
   XCTAssertEqual((CloudSaveBoundary.recordError(error) as? CKError)?.code, .serverRecordChanged)
 }
 
+func testFirstAccountBindingPreservesOfflineEvictionAcrossRestart() async throws {
+  let transport = FakeCloudTransport()
+  transport.accountFailure = CKError(.networkUnavailable)
+  let (archive, context, defaults) = try device(transport: transport)
+  await archive.sync()
+  XCTAssertEqual(transport.saves, 0)
+
+  let local = item("copied before first connection", context: context)
+  local.numberOfCopies = 3
+  archive.capture()
+  let id = ArchiveItem(local).id
+  archive.removing([local], userInitiated: false)
+  context.delete(local)
+  try context.save()
+
+  let restarted = CloudArchive(
+    context: context, defaults: defaults, directory: directories.last!,
+    transport: transport, defaultsDomain: suites.last!
+  )
+  transport.accountFailure = nil
+  await restarted.sync()
+  XCTAssertEqual(transport.saves, 1)
+  let uploaded = try XCTUnwrap(transport.savedLedgers.last?.items[id])
+  XCTAssertEqual(uploaded.value.numberOfCopies, 3)
+  XCTAssertEqual(uploaded.copies.values.reduce(0, +), 3)
+  XCTAssertFalse(uploaded.deleted)
+  XCTAssertTrue(try context.fetch(FetchDescriptor<HistoryItem>()).isEmpty)
+}
+
+func testApprovedDifferentAccountExcludesPreviousAccountRetainedHistory() async throws {
+  let transport = FakeCloudTransport()
+  let (archive, context, _) = try device(transport: transport)
+  let retained = item("previous account only", context: context)
+  await archive.sync()
+  let retainedID = ArchiveItem(retained).id
+  archive.removing([retained], userInitiated: false)
+  context.delete(retained)
+  try context.save()
+  let visible = item("visible local history", context: context)
+  archive.capture()
+  let visibleID = ArchiveItem(visible).id
+
+  transport.accountID = "approved-second-account"
+  await archive.sync(approveAccount: true)
+  let uploaded = try XCTUnwrap(transport.savedLedgers.last)
+  XCTAssertNil(uploaded.items[retainedID])
+  XCTAssertNotNil(uploaded.items[visibleID])
+  XCTAssertEqual(uploaded.items.count, 1)
+}
+
 }
 
 @MainActor
@@ -349,6 +399,8 @@ private final class FakeCloudTransport: CloudTransporting {
   var onFetch: (() -> Void)?
   var saves = 0
   var failure: Error?
+  var accountFailure: Error?
+  var savedLedgers: [SyncLedger] = []
   var remote = SyncLedger()
   var onSave: (() -> Void)?
   var prepareUpload: (() async -> Void)?
@@ -356,6 +408,7 @@ private final class FakeCloudTransport: CloudTransporting {
   var accountQueries = 0
   var cancellations = 0
   func account() async throws -> String {
+    if let accountFailure { throw accountFailure }
     accountQueries += 1
     if let onAccount { await onAccount(accountQueries) }
     return accountID
@@ -371,6 +424,7 @@ private final class FakeCloudTransport: CloudTransporting {
       return Data()
     }, isCurrent: isCurrent) { _ in
       saves += 1
+      savedLedgers.append(ledger)
       onSave?()
     }
   }
