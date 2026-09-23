@@ -1,5 +1,5 @@
 Hello! 👋
-This is Maccy.
+This is Coldbrew.
 Clipboard manager for Mac. 💻
 Search as you type. 🔍
 Open source. ⚙️

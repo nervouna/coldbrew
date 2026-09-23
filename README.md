@@ -40,9 +40,8 @@ Coldbrew works on macOS Sonoma 14 or higher.
 
 ## Install
 
-Coldbrew is currently built from source. Open `Maccy.xcodeproj` in Xcode and
-select the `Maccy` scheme to build `Coldbrew.app`. The internal project and
-module names are retained for compatibility with upstream.
+Coldbrew is currently built from source. Open `Coldbrew.xcodeproj` in Xcode and
+select the `Coldbrew` scheme to build `Coldbrew.app`.
 
 The application uses bundle identifier `io.damao.coldbrew` and keeps its history
 separate from Maccy. In-app update checks are disabled until a Coldbrew release
