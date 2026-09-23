@@ -14,6 +14,7 @@ Coldbrew works on macOS Sonoma 14 or higher.
 * [Features](#features)
 * [Install](#install)
 * [Usage](#usage)
+* [iCloud and backups](#icloud-and-backups)
 * [Advanced](#advanced)
   * [Ignore Copied Items](#ignore-copied-items)
   * [Ignore Custom Copy Types](#ignore-custom-copy-types)
@@ -62,6 +63,10 @@ channel is configured. Report Coldbrew issues in
 10. To disable Coldbrew and ignore new copies, click on the menu icon with <kbd>OPTION (⌥)</kbd> pressed.
 11. To ignore only the next copy, click on the menu icon with <kbd>OPTION (⌥)</kbd> + <kbd>SHIFT (⇧)</kbd> pressed.
 12. To customize the behavior, check "Preferences…" window, or press <kbd>COMMAND (⌘)</kbd> + <kbd>,</kbd>.
+
+## iCloud and backups
+
+See [iCloud sync and independent backups](docs/icloud-and-backups.md) for setup, retention and restore behavior.
 
 ## Advanced
 

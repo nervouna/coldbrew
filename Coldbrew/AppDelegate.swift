@@ -103,6 +103,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
   func applicationDidFinishLaunching(_ aNotification: Notification) {
     migrateUserDefaults()
     disableUnusedGlobalHotkeys()
+    CloudArchive.shared.start()
 
     panel = FloatingPanel(
       contentRect: NSRect(origin: .zero, size: Defaults[.windowSize]),
@@ -121,7 +122,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
   func applicationWillTerminate(_ notification: Notification) {
     if Defaults[.clearOnQuit] {
-      AppState.shared.history.clear()
+      AppState.shared.history.clear(userInitiated: false)
     }
   }
 

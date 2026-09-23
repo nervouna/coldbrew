@@ -122,7 +122,7 @@ class History: ItemsContainer { // swiftlint:disable:this type_body_length
   private func limitHistorySize(to maxSize: Int) {
     let unpinned = all.filter(\.isUnpinned)
     if unpinned.count >= maxSize {
-      unpinned[maxSize...].forEach(delete)
+      unpinned[max(0, maxSize)...].forEach { delete($0, userInitiated: false) }
     }
   }
 
@@ -149,6 +149,7 @@ class History: ItemsContainer { // swiftlint:disable:this type_body_length
       if isModified(item) == nil {
         transferContents(from: existingHistoryItem, to: item)
       }
+      item.syncID = existingHistoryItem.syncID
       item.firstCopiedAt = existingHistoryItem.firstCopiedAt
       item.numberOfCopies += existingHistoryItem.numberOfCopies
       item.pin = existingHistoryItem.pin
@@ -198,6 +199,7 @@ class History: ItemsContainer { // swiftlint:disable:this type_body_length
       AppState.shared.popup.needsResize = true
     }
 
+    CloudArchive.shared.capture()
     return itemDecorator
   }
 
@@ -215,7 +217,8 @@ class History: ItemsContainer { // swiftlint:disable:this type_body_length
   }
 
   @MainActor
-  func clear() {
+  func clear(userInitiated: Bool = true) {
+    CloudArchive.shared.removing(all.filter(\.isUnpinned).map(\.item), userInitiated: userInitiated)
     withLogging("Clearing history") {
       all.forEach { item in
         if item.isUnpinned {
@@ -249,6 +252,7 @@ class History: ItemsContainer { // swiftlint:disable:this type_body_length
 
   @MainActor
   func clearAll() {
+    CloudArchive.shared.removing(all.map(\.item), userInitiated: true)
     withLogging("Clearing all history") {
       all.forEach { item in
         cleanup(item)
@@ -283,9 +287,10 @@ class History: ItemsContainer { // swiftlint:disable:this type_body_length
   }
 
   @MainActor
-  func delete(_ item: HistoryItemDecorator?) {
+  func delete(_ item: HistoryItemDecorator?, userInitiated: Bool = true) {
     guard let item else { return }
 
+    CloudArchive.shared.removing([item.item], userInitiated: userInitiated)
     cleanup(item)
     withLogging("Removing history item") {
       deleteFromStorage(item.item)
@@ -452,6 +457,7 @@ class History: ItemsContainer { // swiftlint:disable:this type_body_length
     guard let item else { return }
 
     item.togglePin()
+    CloudArchive.shared.capture()
 
     let sortedItems = sorter.sort(all.map(\.item))
     if let currentIndex = all.firstIndex(of: item),

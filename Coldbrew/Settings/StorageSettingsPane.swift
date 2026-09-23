@@ -115,6 +115,10 @@ struct StorageSettingsPane: View {
         }
       }
 
+      Settings.Section(label: { Text("iCloud 与备份") }) {
+        CloudArchiveSettings()
+      }
+
       Settings.Section(label: { Text("SortBy", tableName: "StorageSettings") }) {
         Picker("", selection: $sortBy) {
           ForEach(Sorter.By.allCases) { mode in

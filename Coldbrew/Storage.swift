@@ -17,7 +17,7 @@ class Storage {
   }
 
   init() {
-    var config = ModelConfiguration(url: Self.storeURL)
+    var config = ModelConfiguration(url: Self.storeURL, cloudKitDatabase: .none)
 
     #if DEBUG
     if AppDelegate.isTesting {

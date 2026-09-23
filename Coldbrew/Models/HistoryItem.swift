@@ -65,6 +65,7 @@ class HistoryItem {
   ]
   private static let imageTypes: [NSPasteboard.PasteboardType] = StorageType.images.types
 
+  var syncID: String?
   var application: String?
   var firstCopiedAt: Date = Date.now
   var lastCopiedAt: Date = Date.now
